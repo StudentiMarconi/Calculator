@@ -3,7 +3,7 @@
 
 // Maximum tokens during processing
 #define MAX_TOKENS 32
-#define OP_TIME 3000
+#define OP_TIME 500
 
 //////////////////////////////
 /// === INITIALIZATION === ///
@@ -25,8 +25,8 @@ char keys[ROWS][COLS] = {
 };
 
 // Initialize keypad
-byte rowPins[ROWS] = { 13, 12, 11, 10 };
-byte colPins[COLS] = { 9, 8, 7, 6 };
+byte rowPins[ROWS] = { 13, 12, 14, 27 };
+byte colPins[COLS] = { 26, 25, 33, 32 };
 Keypad keypad = Keypad(makeKeymap(keys), rowPins, colPins, ROWS, COLS);
 
 ///////////////////////
@@ -494,6 +494,7 @@ void print() {
 
 unsigned long lastTime;
 char lastKey;
+String variables[10];
 
 void setup() {
   /*
@@ -520,27 +521,29 @@ void setup() {
 }
 
 char opTable[3][4] = {
-  {'+','-','*','/'},
-  {'(','.','^','_'},
-  {'$','#','!','%'},
+  { '+', '-', '*', '/' },
+  { '(', '.', '^', '_' },
+  { '$', '#', '!', '%' },
 };
 
-char consts[4] = {'p', 'e', 'r', 'a'};
+char consts[4] = { 'p', 'e', 'r', 'a' };
 
 void loop() {
-  // char key = keypad.getKey();
-  char key = NO_KEY;
-  if (Serial.available())
-    key = Serial.read();
-
+  char key = keypad.getKey();
   if (key != NO_KEY) {
     bool opPress = key == lastKey && millis() - lastTime < OP_TIME;
-    int lastOp = operation.length()-1;
+    int lastOp = operation.length() - 1;
 
-    if (key == 'C' && operation.length()) {
+    if ((key == 'C' || key == '3') && operation.length()) {  // TODO: key is not 3 bruh
       operation = operation.substring(0, operation.length() - 1);
     } else if (key == '=') {
-      calculate();
+      if (operation.length()==2 && isdigit(operation[0]) && operation[1]=='$') {
+        variables[operation.substring(1, operation.length()).toInt()] = result;
+        result = "$"+String(operation.substring(1, operation.length()))+"="+operation;
+      } else {
+        
+        calculate();
+      }
     } else if (key == '+' || key == '-' || key == '*' || key == '/') {
       int id = (key == '+')   ? 0
                : (key == '-') ? 1
@@ -554,51 +557,13 @@ void loop() {
         else if (operation[lastOp] == opTable[1][id])
           operation[lastOp] = opTable[2][id];
       } else operation += opTable[0][id];
-    }
-    /*
-    else if (key == '+') {
-      if (opPress) {
-        if (operation[operation.length()-1] == '+') {
-          operation[operation.length()-1] = '$';
-        } else if (operation[operation.length()-1] == '$') {
-          operation[operation.length()-1] = '#';
-        } else operation += '+';
-      } else operation += '+';
-    } else if (key == '-') {
-      if (opPress) {
-        if (operation[operation.length()-1] == '-') {
-          operation[operation.length()-1] = '.';
-        } else if (operation[operation.length()-1] == '.') {
-          operation[operation.length()-1] = 'f';
-        } else operation += '-';
-      } else operation += '-';
-    } else if (key == '*') {
-      if (opPress) {
-        if (operation[operation.length()-1] == '*') {
-          operation[operation.length()-1] = '^';
-        } else if (operation[operation.length()-1] == '^') {
-          operation[operation.length()-1] = '!';
-        } else operation += '*';
-      } else operation += '*';
-    } else if (key == '/') {
-      if (opPress) {
-        if (operation[operation.length()-1] == '/') {
-          operation[operation.length()-1] = '_';
-        } else if (operation[operation.length()-1] == '_') {
-          operation[operation.length()-1] = '%';
-        } else operation += '/';
-      } else operation += '/';
-    }
-    */
-    else if (isdigit(key) || key=='#') {
+    } else if (isdigit(key) || key == '#') {
       operation += key;
     }
 
     lastTime = millis();
     lastKey = key;
-  }
 
-  if (key == '\n') {
     String line1, line2;
     line1 = operation;
     line1 = wrap(line1);
@@ -614,113 +579,3 @@ void loop() {
     Serial.println("##################");
   }
 }
-
-/*
-void loop() {
-  // Get pressed key
-  char key = keypad.getKey();
-
-  if (key != NO_KEY) {
-    if (key == 'C' && operation.length())
-      operation = operation.substring(0, operation.length() - 1);
-    else if (key == '=') {
-      result = evaluate(operation);
-    } else if (key == '+') {
-      operation += '+';
-    } else if (key == '-') {
-      operation += '-';
-    } else if (key == '*') {
-      operation += '*';
-    } else if (key == '/') {
-      operation += '/';
-    } else if (_isdigit(key)) {
-      operation += key;
-    }
-    print();
-  }
-
-  /*
-  // Get current pressed key
-  char key = keypad.getKey();
-
-  // If a key is pressed
-  if (key != NO_KEY) {
-    // Index of last typed character
-    int n = operation.length() - 1;
-
-    // If `C` is pressed
-    if (key == 'C') {
-      // Remove the last character from `operation`
-      String newText = "";
-      for (int i = 0; i < n; i++) {
-        newText += operation[i];
-      }
-      operation = newText;
-    }
-    // If `=` is pressed
-    else if (key == '=') {
-      // If `=` was pressed twice, replace the operation with `Ans`...
-      if (lastEq) operation = "a";
-      // ...otherwise, evaluate the result
-      else {
-        String op = operation;
-        op.replace("a", result);
-        result = evaluate(op);
-      }
-    }
-    // If '*' is pressed
-    else if (key == '*') {
-      // If the last character was '*', replace it with '^'
-      if (operation[n] == '*') {
-        operation[n] = '^';
-      }
-      // If the last character was '^', replace it with '*'
-      else if (operation[n] == '^') {
-        operation[n] = '*';
-      }
-      // If the last character was a digit, add '*' to the operation
-      else if (_isdigit(operation[n])) {
-        operation += key;
-      }
-    }
-    // If '/' is pressed
-    else if (key == '/') {
-      // If the last character was '/', replace it with '_' (root)
-      if (operation[n] == '/') {
-        operation[n] = '_';
-      }
-      // If the last character was '_' (root), replace it with '/'
-      else if (operation[n] == '_') {
-        operation[n] = '/';
-      }
-      // If the last character was a digit, add '/' to the operation
-      else if (_isdigit(operation[n])) {
-        operation += key;
-      }
-    }
-    // If a digit is pressed, or '+'|'-' was pressed and the last character was a digit, add the pressed button to the operation
-    else if (_isdigit(key) || ((key == '+' || key == '-') && _isdigit(operation[n]))) {
-      operation += key;
-    }
-
-    // Update the screen
-    print();
-    // Save whether '=' was pressed
-    lastEq = key == '=';
-  }
-  *
-}
-void setup() {
-  // Initialize the 16x2 LCD
-  lcd.begin(16, 2);
-  // Add the `root` character as `0`
-  lcd.createChar(0, root);
-
-  // Setup randomization by generating a seed
-  randomSeed(analogRead(0));
-}
-
-bool lastEq = false;  // `true` if the previous pressed character was '='
-
-
-*/
