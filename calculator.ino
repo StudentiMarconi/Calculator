@@ -453,7 +453,7 @@ void calculate() {
 /// === OUTPUT === ///
 //////////////////////
 
-// Wraps `text` to fit in 16 characters
+/*/ Wraps `text` to fit in 16 characters
 String wrap(String text) {
   String res = "";
   if (text.length() > 16) {
@@ -486,7 +486,7 @@ void print() {
 
   lcd.setCursor(16 - line2.length(), 1);
   lcd.print(line2);
-}
+}*/
 
 /////////////////////////
 /// === MAIN CODE === ///
@@ -537,11 +537,17 @@ void loop() {
     if ((key == 'C' || key == '3') && operation.length()) {  // TODO: key is not 3 bruh
       operation = operation.substring(0, operation.length() - 1);
     } else if (key == '=') {
+      if (operation.contains("$$")) {
+        
+      }
       if (operation.length()==2 && isdigit(operation[0]) && operation[1]=='$') {
         variables[operation.substring(1, operation.length()).toInt()] = result;
         result = "$"+String(operation.substring(1, operation.length()))+"="+operation;
       } else {
-        
+        String tmpOp = operation;
+        for (int i=0; i<10; i++) {
+          operation.replace("$"+i, variables[i]);
+        }
         calculate();
       }
     } else if (key == '+' || key == '-' || key == '*' || key == '/') {
@@ -552,9 +558,10 @@ void loop() {
       if (operation[lastOp] == '#')
         operation[lastOp] = consts[id];
       else if (opPress) {
-        if (operation[lastOp] == opTable[0][id])
-          operation[lastOp] = opTable[1][id];
-        else if (operation[lastOp] == opTable[1][id])
+        if (operation[lastOp] == opTable[0][id]) {
+          if (opTable[1][id] == '(' && lastOp && !_isdigit(operation[lastOp])) operarion[lastOp] = ')';
+          else operation[lastOp] = opTable[1][id];
+        } else if (operation[lastOp] == opTable[1][id])
           operation[lastOp] = opTable[2][id];
       } else operation += opTable[0][id];
     } else if (isdigit(key) || key == '#') {
