@@ -39,9 +39,9 @@ void setup() {
 }
 
 void loop() {
+  delay(1000);
   lcd.setCursor(0,0);
   lcd.print("Sei gay");
-  delay(1000);
 }
 
 char opTable[3][4] = {
