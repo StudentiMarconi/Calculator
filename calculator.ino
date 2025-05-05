@@ -2,11 +2,11 @@
 #include "parser.h"
 #include "symbols.h"
 #include "utils.h"
-#include <Keypad.h>
+//#include <Keypad.h>
 #include <LiquidCrystal.h>
 
 // Initialize the LCD
-LiquidCrystal lcd(15, 2, 0, 4, 16, 17);
+LiquidCrystal lcd(35, 32, 33, 25, 26, 27);
 
 // Keypad rows
 const byte ROWS = 4;
@@ -21,7 +21,7 @@ char keys[ROWS][COLS] = {{'1', '2', '3', '+'},
 // Initialize keypad
 byte rowPins[ROWS] = {13, 12, 14, 27};
 byte colPins[COLS] = {26, 25, 33, 32};
-Keypad keypad = Keypad(makeKeymap(keys), rowPins, colPins, ROWS, COLS);
+//Keypad keypad = Keypad(makeKeymap(keys), rowPins, colPins, ROWS, COLS);
 
 String operation = ""; // Stores the operation being typed by the user
 String result = "";    // Stores the result of the operation
@@ -36,6 +36,11 @@ void setup() {
   lcd.createChar(1, pi);
   lcd.createChar(2, base2);
   lcd.createChar(3, base10);
+
+  lcd.setCursor(0,0);
+  lcd.print("1234567890123456");
+  lcd.setCursor(0,1);
+  lcd.print("1234567890123456");
 }
 
 char opTable[3][4] = {
@@ -53,6 +58,9 @@ String funcs[10] = {
     "abs",  "floor", "ceil",
 };
 
+void loop() {}
+
+/*
 void loop() {
   // Get current pressed key
   char key = keypad.getKey();
@@ -121,9 +129,12 @@ void loop() {
     } else if (isdigit(key)) {
       // Pressing a digit after '#' will replace it with `f`, thus creating a
       // function
-      if (lastOp >= 0 && operation[lastOp] == '#')
-        operation[lastOp] = 'f';
-      operation += key;
+      if (lastKey == '=' && result.length() && result[0]!='!') operation = key;
+      else {
+        if (lastOp >= 0 && operation[lastOp] == '#')
+          operation[lastOp] = 'f';
+        operation += key;
+      }
     }
 
     lastTime = millis();
@@ -156,3 +167,4 @@ void loop() {
     lcd.print(line2);
   }
 }
+*/
