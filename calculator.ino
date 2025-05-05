@@ -36,11 +36,12 @@ void setup() {
   lcd.createChar(1, pi);
   lcd.createChar(2, base2);
   lcd.createChar(3, base10);
+}
 
+void loop() {
   lcd.setCursor(0,0);
-  lcd.print("1234567890123456");
-  lcd.setCursor(0,1);
-  lcd.print("1234567890123456");
+  lcd.print("Sei gay");
+  delay(1000);
 }
 
 char opTable[3][4] = {
@@ -57,8 +58,6 @@ String funcs[10] = {
     "logD", // log10
     "abs",  "floor", "ceil",
 };
-
-void loop() {}
 
 /*
 void loop() {
