@@ -2,11 +2,12 @@
 #include "parser.h"
 #include "symbols.h"
 #include "utils.h"
-//#include <Keypad.h>
-#include <LiquidCrystal.h>
+#include <Keypad.h>
+#include <Wire.h>
+#include <LiquidCrystal_I2C.h>
 
 // Initialize the LCD
-LiquidCrystal lcd(35, 32, 33, 25, 26, 27);
+LiquidCrystal_I2C lcd(0x27, 16, 2);
 
 // Keypad rows
 const byte ROWS = 4;
@@ -21,7 +22,7 @@ char keys[ROWS][COLS] = {{'1', '2', '3', '+'},
 // Initialize keypad
 byte rowPins[ROWS] = {13, 12, 14, 27};
 byte colPins[COLS] = {26, 25, 33, 32};
-//Keypad keypad = Keypad(makeKeymap(keys), rowPins, colPins, ROWS, COLS);
+Keypad keypad = Keypad(makeKeymap(keys), rowPins, colPins, ROWS, COLS);
 
 String operation = ""; // Stores the operation being typed by the user
 String result = "";    // Stores the result of the operation
@@ -31,17 +32,9 @@ char lastKey = ' ';
 String variables[10];
 
 void setup() {
-  lcd.begin(16, 2);
-  lcd.createChar(0, root);
-  lcd.createChar(1, pi);
-  lcd.createChar(2, base2);
-  lcd.createChar(3, base10);
-}
-
-void loop() {
-  delay(1000);
-  lcd.setCursor(0,0);
-  lcd.print("Sei gay");
+  Wire.begin(); // Usa automaticamente SDA=21 e SCL=22
+  lcd.init();
+  lcd.backlight();
 }
 
 char opTable[3][4] = {
@@ -59,7 +52,6 @@ String funcs[10] = {
     "abs",  "floor", "ceil",
 };
 
-/*
 void loop() {
   // Get current pressed key
   char key = keypad.getKey();
@@ -166,4 +158,3 @@ void loop() {
     lcd.print(line2);
   }
 }
-*/
