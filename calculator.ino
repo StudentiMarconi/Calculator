@@ -20,8 +20,8 @@ char keys[ROWS][COLS] = {{'1', '2', '3', '+'},
                          {'C', '0', '=', '/'}};
 
 // Initialize keypad
-byte rowPins[ROWS] = {13, 12, 14, 27};
-byte colPins[COLS] = {26, 25, 33, 32};
+byte colPins[ROWS] = {13, 12, 14, 27};
+byte rowPins[COLS] = {26, 25, 33, 32};
 Keypad keypad = Keypad(makeKeymap(keys), rowPins, colPins, ROWS, COLS);
 
 String operation = ""; // Stores the operation being typed by the user
