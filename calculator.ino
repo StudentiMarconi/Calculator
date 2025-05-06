@@ -113,7 +113,7 @@ void loop() {
       // If a key was pressed multiple times in less than OP_TIME milliseconds
       else if (opPress) {
         if (lastOp >= 0 && operation[lastOp] == opTable[0][id]) {
-          if (opTable[1][id] == '(' && lastOp && !is_digit(operation[lastOp]))
+          if (opTable[1][id] == '(' && lastOp && is_digit(operation[lastOp]))
             operation[lastOp] = ')';
           else
             operation[lastOp] = opTable[1][id];
