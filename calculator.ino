@@ -35,6 +35,10 @@ void setup() {
   Wire.begin(); // Usa automaticamente SDA=21 e SCL=22
   lcd.init();
   lcd.backlight();
+  lcd.createChar(0, root);
+  lcd.createChar(1, pi);
+  lcd.createChar(2, base2);
+  lcd.createChar(3, base10);
 }
 
 char opTable[3][4] = {
